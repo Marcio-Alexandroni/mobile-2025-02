@@ -1,14 +1,15 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:black_jack/Acao.dart';
 import 'package:black_jack/Carta.dart';
 import 'package:black_jack/Jogador.dart';
 
-const COPAS = '\u2665';
-const ESPADAS = '\u2660';
-const OURO = '\u2666';
-const PAUS = '\u2663';
+const copas = '\u2665';
+const espadas = '\u2660';
+const ouro = '\u2666';
+const paus = '\u2663';
 
-var jogador_pessoa;
+var jogadorPessoa = Jogador();
 
 var cartas = <Carta>[];
 
@@ -19,8 +20,8 @@ void inicio() {
   print('### Black Jack ###');
   print('Informe o seu nome:');
   String? nomeJogador = stdin.readLineSync();
-  jogador_pessoa = Jogador(nome: nomeJogador ?? "");
-  print('Bem vindo: $jogador_pessoa');
+  jogadorPessoa = Jogador(nome: nomeJogador ?? "");
+  print('Bem vindo: $jogadorPessoa');
 
 }
 
@@ -37,42 +38,42 @@ void aposta(Jogador jogador) {
 
 void criarCartas() {
   for (var i = 2; i < 11; i++) {
-    cartas.add(Carta('$i$COPAS', i));
-    cartas.add(Carta('$i$ESPADAS', i));
-    cartas.add(Carta('$i$OURO', i));
-    cartas.add(Carta('$i$PAUS', i));
+    cartas.add(Carta('$i$copas', i));
+    cartas.add(Carta('$i$espadas', i));
+    cartas.add(Carta('$i$ouro', i));
+    cartas.add(Carta('$i$paus', i));
   }
-    cartas.add(Carta('J$COPAS', 10));
-    cartas.add(Carta('J$ESPADAS', 10));
-    cartas.add(Carta('J$OURO', 10));
-    cartas.add(Carta('J$PAUS', 10));
+    cartas.add(Carta('J$copas', 10));
+    cartas.add(Carta('J$espadas', 10));
+    cartas.add(Carta('J$ouro', 10));
+    cartas.add(Carta('J$paus', 10));
 
-    cartas.add(Carta('Q$COPAS', 10));
-    cartas.add(Carta('Q$ESPADAS', 10));
-    cartas.add(Carta('Q$OURO', 10));
-    cartas.add(Carta('Q$PAUS', 10));
+    cartas.add(Carta('Q$copas', 12));
+    cartas.add(Carta('Q$espadas', 12));
+    cartas.add(Carta('Q$ouro', 12));
+    cartas.add(Carta('Q$paus', 12));
 
-    cartas.add(Carta('K$COPAS', 10));
-    cartas.add(Carta('K$ESPADAS', 10));
-    cartas.add(Carta('K$OURO', 10));
-    cartas.add(Carta('K$PAUS', 10));
+    cartas.add(Carta('K$copas', 15));
+    cartas.add(Carta('K$espadas', 15));
+    cartas.add(Carta('K$ouro', 15));
+    cartas.add(Carta('K$paus', 15));
 
-    cartas.add(Carta('A$COPAS', 1));
-    cartas.add(Carta('A$ESPADAS', 1));
-    cartas.add(Carta('A$OURO', 1));
-    cartas.add(Carta('A$PAUS', 1));
+    cartas.add(Carta('A$copas', 1));
+    cartas.add(Carta('A$espadas', 1));
+    cartas.add(Carta('A$ouro', 1));
+    cartas.add(Carta('A$paus', 1));
 
 }
 
 void abreMesa() {
 
-  for (var i = 0; i < 3; i++) {
-    pedeCarta();
+  for (var i = 0; i < 2; i++) {
+    comprar();
   }
 
 }
 
-void pedeCarta() {
+void comprar() {
 
   int idCarta = Random().nextInt(cartas.length - 1);
   cartasMesa.add(cartas.elementAt(idCarta));
@@ -82,9 +83,13 @@ void pedeCarta() {
 
 void imprimeMesa() {
   print("-- Cartas Mesa --");
+  var total = 0;
   for (var carta in cartasMesa) {
     print(carta);
+    total += carta.valor;
   }
+  print("-- Total pontos $total");
+
 }
 
 int valorCartas() {
@@ -99,11 +104,27 @@ int valorCartas() {
 }
 void main() {
 
+  inicio();
   criarCartas();
   abreMesa();
   imprimeMesa();
-  pedeCarta();
-  imprimeMesa();
-  inicio();
+  print ('Qual a sua ação? ${Acao.opcoes()}');
+  String? acao = stdin.readLineSync();
+
+  do {
+
+    if (Acao.values.byName(acao!) == Acao.comprar) {
+      comprar();
+      imprimeMesa();
+    } else if (Acao.values.byName(acao) == Acao.apostar) {
+      aposta(jogadorPessoa);
+    }
+
+    if (Acao.values.byName(acao) != Acao.fim) {
+      print ('Qual a sua ação? ${Acao.opcoes()}');
+      acao = stdin.readLineSync();
+    }
+
+  } while (Acao.values.byName(acao!) != Acao.fim);
 
 }
