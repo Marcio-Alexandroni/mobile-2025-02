@@ -55,42 +55,54 @@ class _CotacaoState extends State<CotacaoSateful> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _valorController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'Valor',     border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0), // define o arredondamento
+                child: TextField(
+                  controller: _valorController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(labelText: 'Valor', border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0), // define o arredondamento
+                  ),
+                  ),
+                ),
+              ),
+            Padding(padding: const EdgeInsets.all(16),
+            child:         Row(mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(child:                 DropdownButton<String>(
+                  value: _cotacaoDe,
+                  onChanged: (v) {
+                    print(v);
+                    setState(() {
+                      _cotacaoDe = v!;
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem(value: 'CAD', child: Text('CAD')),
+                    DropdownMenuItem(value: 'USD', child: Text('USD')),
+                    DropdownMenuItem(value: 'EUR', child: Text('EUR')),
+                    DropdownMenuItem(value: 'BRL', child: Text('BRL')),
+                  ],
                 ),),
-              ),
-              ),
-
-          DropdownButton<String>(
-            value: _cotacaoDe,
-            onChanged: (v) {
-              setState(() {
-                _cotacaoDe = v!;
-              });
-            },
-            items: const [
-              DropdownMenuItem(value: 'USD', child: Text('USD')),
-              DropdownMenuItem(value: 'EUR', child: Text('EUR')),
-              DropdownMenuItem(value: 'BRL', child: Text('BRL')),
-            ],
-          ),
-            DropdownButton<String>(
-              value: _cotacaoPara,
-              onChanged: (v) {
-                setState(() {
-                  _cotacaoPara = v!;
-                });
-              },
-              items: const [
-                DropdownMenuItem(value: 'USD', child: Text('USD')),
-                DropdownMenuItem(value: 'EUR', child: Text('EUR')),
-                DropdownMenuItem(value: 'BRL', child: Text('BRL')),
+                const SizedBox(width: 24),
+                Expanded(child: DropdownButton<String>(
+                  value: _cotacaoPara,
+                  onChanged: (v) {
+                    setState(() {
+                      _cotacaoPara = v!;
+                    });
+                  },
+                  items: const [
+                    DropdownMenuItem(value: 'USD', child: Text('USD')),
+                    DropdownMenuItem(value: 'EUR', child: Text('EUR')),
+                    DropdownMenuItem(value: 'BRL', child: Text('BRL')),
+                  ],
+                ),
+                ),
               ],
             ),
+            ),
+              const SizedBox(height: 26,),
             Text(_resultado),
+            const SizedBox(height: 26,),
             ElevatedButton(onPressed: () async {
 
               var url = Uri.parse("https://api.frankfurter.app/latest?amount=${_valorController.text}&from=$_cotacaoDe&to=$_cotacaoPara");
