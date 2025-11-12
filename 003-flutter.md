@@ -407,7 +407,18 @@ class _TelaConversorState extends State<TelaConversor> {
     );
   }
 }
-
+```
+- Dica: para acrescentar uma borda arredondata no `TextField` com margens internas (`Padding`):
+```dart
+Padding(padding: const EdgeInsets.all(16),
+child: TextField(
+  controller: _valorController,
+  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+  decoration: InputDecoration(labelText: 'Valor',     border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12.0), // define o arredondamento
+  ),),
+),
+),
 ```
 ***
 ### Pedidos Pizza

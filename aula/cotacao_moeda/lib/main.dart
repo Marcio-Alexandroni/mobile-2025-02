@@ -3,104 +3,113 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 void main() {
-  runApp(CotacaoStateless());
+  runApp(const CotacaoApp());
 }
 
-class CotacaoStateless extends StatelessWidget {
+class CotacaoApp extends StatelessWidget {
 
-
+  const CotacaoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
+      title: 'Cotação Moeda',
       debugShowCheckedModeBanner: false,
-      title: "Cotação Moeda",
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Cotação Moeda", style: TextStyle(color: Colors.white),),
-          backgroundColor: Colors.amber,
-          leading: Icon(Icons.currency_exchange, color: Colors.white,),
-        ),
-        body: _CotacaoStateful(),
-        floatingActionButton: FloatingActionButton(onPressed: (){}),
-      )
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+        useMaterial3: true,
+      ),
+      home: const CotacaoSateful(title: 'Cotação Moeda'),
     );
-
   }
-
 }
 
-class _CotacaoStateful extends StatefulWidget {
+class CotacaoSateful extends StatefulWidget {
+
+  const CotacaoSateful({super.key, required this.title});
+
+  final String title;
 
   @override
-  State<_CotacaoStateful> createState() => _CotacaoState();
-
+  State<CotacaoSateful> createState() => _CotacaoState();
 }
 
-class _CotacaoState extends State<_CotacaoStateful> {
+class _CotacaoState extends State<CotacaoSateful> {
 
   final TextEditingController _valorController = TextEditingController(text: "1");
+  var _cotacaoDe = 'BRL';
+  var _cotacaoPara = 'USD';
+  var _resultado = "Resultado";
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Column(children: [
-      TextField(
-        controller: _valorController,
-        keyboardType: TextInputType.numberWithOptions(decimal: true),
-        decoration: const InputDecoration(labelText: 'Valor'),
+
+    return Scaffold(
+      appBar: AppBar(
+        leading: const Icon(Icons.currency_exchange, color: Colors.white,),
+        title: Text(widget.title, style: const TextStyle(color: Colors.white),),
+        backgroundColor: Colors.blueAccent,
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-        DropdownButton<String>(
-          value: 'USD',
-          onChanged: (v) => print (v),
-          items: const [
-            DropdownMenuItem(value: 'USD', child: Text('USD')),
-            DropdownMenuItem(value: 'EUR', child: Text('EUR')),
-            DropdownMenuItem(value: 'BRL', child: Text('BRL')),
-          ],
-        ),
-          SizedBox(width: 50,),
+      body: Center(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(padding: const EdgeInsets.all(16),
+              child: TextField(
+                controller: _valorController,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: InputDecoration(labelText: 'Valor',     border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0), // define o arredondamento
+                ),),
+              ),
+              ),
+
           DropdownButton<String>(
-          value: 'USD',
-          onChanged: (v) => print (v),
-          items: const [
-            DropdownMenuItem(value: 'USD', child: Text('USD')),
-            DropdownMenuItem(value: 'EUR', child: Text('EUR')),
-            DropdownMenuItem(value: 'BRL', child: Text('BRL')),
-          ],
+            value: _cotacaoDe,
+            onChanged: (v) {
+              setState(() {
+                _cotacaoDe = v!;
+              });
+            },
+            items: const [
+              DropdownMenuItem(value: 'USD', child: Text('USD')),
+              DropdownMenuItem(value: 'EUR', child: Text('EUR')),
+              DropdownMenuItem(value: 'BRL', child: Text('BRL')),
+            ],
+          ),
+            DropdownButton<String>(
+              value: _cotacaoPara,
+              onChanged: (v) {
+                setState(() {
+                  _cotacaoPara = v!;
+                });
+              },
+              items: const [
+                DropdownMenuItem(value: 'USD', child: Text('USD')),
+                DropdownMenuItem(value: 'EUR', child: Text('EUR')),
+                DropdownMenuItem(value: 'BRL', child: Text('BRL')),
+              ],
+            ),
+            Text(_resultado),
+            ElevatedButton(onPressed: () async {
+
+              var url = Uri.parse("https://api.frankfurter.app/latest?amount=${_valorController.text}&from=$_cotacaoDe&to=$_cotacaoPara");
+              var resposta = await http.get(url);
+              final dado = json.decode(resposta.body);
+              setState(() {
+                if (dado["message"] == null) {
+                  _resultado = "${dado['rates'][_cotacaoPara]}";
+                } else {
+                  _resultado = "${dado['message']}";
+                }
+              });
+
+            }, child: const Text("Obter Cotação"))
+          ]
         ),
-
-      ],),
-
-      ElevatedButton(onPressed: () async {
+      ),
+    );
 
 
-        try {
-          final url = Uri.parse('https://api.frankfurter.app/latest?amount=1&from=BRL&to=USD');
-          final resposta = await http.get(url);
-          if (resposta.statusCode == 200) {
-            final dados = json.decode(resposta.body);
-            final rates = dados['rates'] as Map<String,dynamic>;
-            setState(() {
-              print(dados);
-            });
-          }
-        } catch (e) {
-          setState(() {
-          });
-        } finally {
-          setState(() {
-          });
-        }
-
-      }, child: Text("Mudar Texto"))
-    ],
-    mainAxisAlignment: MainAxisAlignment.center,
-    ));
   }
-
 }
-
