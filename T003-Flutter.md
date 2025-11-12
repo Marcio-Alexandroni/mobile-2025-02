@@ -13,3 +13,6 @@
 - O tributo `front_default` possui como valor um link para a imagem do **Pokemón**
 - Sua aplicação deve exibir o nome do **Pokemón** e a sua imagem de forma aleatória
 - Deve também existir um botão que, ao ser pressionado, deve efetuar uma requisição ao *endpoint* acima e atualizar a imagem e o nome do **Pokemón**
+- Dica: para gerar números aleatórios em *dart*
+    - Importar `import 'dart:math';`
+    - Sorteia um número entre 1 e 151 `int ID = Random().nextInt(150) + 1;`
